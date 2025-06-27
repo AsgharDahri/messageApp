@@ -5,6 +5,7 @@
 2. Run npm install
 3. Configure Env [ Kafka, Elastic Search, DB_URL, Elastic Password, System Port ]
 4. npm run start:dev
+5. For APIs: Import collection to postman from root foler [ MessageApp.postman_collection.json ]
 
 
 
