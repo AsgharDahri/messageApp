@@ -1,0 +1,117 @@
+{
+	"info": {
+		"_postman_id": "941ddaea-0e17-4d32-8e87-c5313fd81cc6",
+		"name": "MessageApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44507899",
+		"_collection_link": "https://ghulamasghardahri.postman.co/workspace/Ghulam-Asghar-Dahri's-Workspace~2ff4d8f3-2884-4ba5-8bb1-153356a24e5d/collection/44507899-941ddaea-0e17-4d32-8e87-c5313fd81cc6?action=share&source=collection_link&creator=44507899"
+	},
+	"item": [
+		{
+			"name": "CreateMessage",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"conversationId\": \"123\",\r\n    \"senderId\": \"456\",\r\n    \"content\": \"Hello Test321\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get messages pagination",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/conversations/123/messages?page=1&limit=10&sortField=timestamp&sortOrder=asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"conversations",
+						"123",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "sortField",
+							"value": "timestamp"
+						},
+						{
+							"key": "sortOrder",
+							"value": "asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get full text search",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/conversations/123/messages/search?q=brother",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"conversations",
+						"123",
+						"messages",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "brother"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
