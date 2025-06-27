@@ -1,98 +1,127 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## How to install ?
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+1. Clone the repository
+2. Run npm install
+3. Configure Env [ Kafka, Elastic Search, DB_URL, Elastic Password, System Port ]
+4. npm run start:dev
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## System Architecture Diagram
 
-```bash
-$ npm install
+```mermaid
+graph TB
+    %% Client Layer
+    Client[Client Applications] --> API[API Gateway/REST Endpoints]
+    
+    %% Application Layer
+    API --> Controller[Messages Controller]
+    Controller --> Service[Messages Service]
+    
+    %% Data Layer
+    Service --> MongoDB[(MongoDB Database)]
+    Service --> Elasticsearch[(Elasticsearch)]
+    Service --> Kafka[Apache Kafka]
+    
+    %% External Services
+    Kafka --> Consumer[Kafka Consumers]
+    Elasticsearch --> Search[Search Engine]
+    
+    %% Configuration
+    Config[Configuration Module] --> Service
+    Config --> MongoDB
+    Config --> Elasticsearch
+    Config --> Kafka
+    
+    %% Styling
+    classDef clientLayer fill:#e1f5fe
+    classDef appLayer fill:#f3e5f5
+    classDef dataLayer fill:#e8f5e8
+    classDef configLayer fill:#fff3e0
+    
+    class Client,API clientLayer
+    class Controller,Service appLayer
+    class MongoDB,Elasticsearch,Kafka,Consumer,Search dataLayer
+    class Config configLayer
 ```
 
-## Compile and run the project
 
-```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+## Data Flow
 
-# production mode
-$ npm run start:prod
+### Message Creation Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant MongoDB
+    participant Elasticsearch
+    participant Kafka
+    
+    Client->>Controller: POST /api/messages
+    Controller->>Service: createMessage(dto)
+    Service->>MongoDB: Save message
+    Service->>Elasticsearch: Index message
+    Service->>Kafka: Emit message event
+    Service->>Controller: Return success response
+    Controller->>Client: HTTP 200 OK
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+### Message Retrieval Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant MongoDB
+    
+    Client->>Controller: GET /api/conversations/:id/messages
+    Controller->>Service: getMessagesPaginated()
+    Service->>MongoDB: Query messages with pagination
+    MongoDB->>Service: Return messages
+    Service->>Controller: Return paginated response
+    Controller->>Client: HTTP 200 OK with data
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Message Search Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant Elasticsearch
+    
+    Client->>Controller: GET /api/conversations/:id/messages/search?q=query
+    Controller->>Service: searchMessages(conversationId, query)
+    Service->>Elasticsearch: Search messages
+    Elasticsearch->>Service: Return search results
+    Service->>Controller: Return search response
+    Controller->>Client: HTTP 200 OK with results
 ```
+## 🛠️ Tech Stack
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- **NestJS**, **TypeScript** – Backend framework  
+- **MongoDB**, **Mongoose** – Data storage  
+- **Elasticsearch** – Full-text search  
+- **Kafka**, **KafkaJS** – Real-time messaging  
+- **@nestjs/config** – Env config
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📦 Modules
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **AppModule** – Root config & imports  
+- **MessagesModule** – APIs, logic, Mongo schema  
+- **KafkaModule** – Kafka setup & messaging  
+- **ElasticsearchModule** – Search/indexing  
+- **DatabaseModule** – MongoDB connection
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🔌 API Endpoints
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `POST /api/messages` – Create + store + index + publish  
+- `GET /api/conversations/:id/messages` – Paginated fetch  
+- `GET /api/conversations/:id/messages/search?q=` – Full-text search
