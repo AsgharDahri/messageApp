@@ -1,13 +1,10 @@
 
 ## How to install ?
-
-1. Clone the repository
-2. Run npm install
-3. Configure Env [ Kafka, Elastic Search, DB_URL, Elastic Password, System Port ]
-4. npm run start:dev
-5. For APIs: Import collection to postman from root foler [ MessageApp.postman_collection.json ]
-
-
+1. Clone the repository to your local machine.
+2. Execute npm install to install all required dependencies.
+3. Configure the environment variables, including Kafka, Elasticsearch, database URL, Elasticsearch password, and system port.
+4. Start the development server by running npm run start:dev.
+5. To test the APIs, import the Postman collection located at the root directory (MessageApp.postman_collection.json) into Postman.
 
 ## System Architecture Diagram
 
